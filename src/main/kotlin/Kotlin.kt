@@ -79,7 +79,9 @@ enum class KotlinCompilerPlugin {
 
 // ripped from org.gradle.kotlin.dsl (RepositoryHandlerExtensions.kt)
 private fun RepositoryHandler.maven(url: Any) =
-        maven { it.setUrl(url) }
+        maven {
+            setUrl(url)
+        }
 
 fun Project.kotlinRepositories() {
     with (repositories) {

@@ -62,8 +62,8 @@ val Configuration.deprecatedForDeclaration: Boolean get() =
 
 // TODO make this a task type as well
 fun Project.bash(script: String) {
-    this.exec { s: ExecSpec ->
-        s.commandLine("bash", "-c", "set -e; $script")
+    this.exec {
+        commandLine("bash", "-c", "set -e; $script")
     }
 }
 

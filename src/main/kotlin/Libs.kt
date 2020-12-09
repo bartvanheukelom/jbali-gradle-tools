@@ -30,5 +30,6 @@ object Ktor {
             const val jvm = "io.ktor:ktor-client-serialization-jvm"
         }
     }
+    const val serialization = "io.ktor:ktor-serialization"
     const val websockets = "io.ktor:ktor-websockets"
 }

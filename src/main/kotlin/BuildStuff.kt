@@ -75,3 +75,32 @@ fun Project.bash(script: String) {
 fun CompileOptions.storeParameterNames() {
     compilerArgs.add("-parameters")
 }
+
+
+
+/**
+ * Configure dependency resolution to throw a hard error if anything
+ * in the builds tries to pull in one of the given dependencies.
+ * Specify the dependencies as "$group:$name" (no version).
+ */
+fun Project.forbidDependencies(vararg forbiddenDependencies: String) {
+    forbidDependencies(forbiddenDependencies.asSequence().toSet())
+}
+
+/**
+ * Configure dependency resolution to throw a hard error if anything
+ * in the builds tries to pull in one of the given dependencies.
+ * Specify the dependencies as "$group:$name" (no version).
+ */
+fun Project.forbidDependencies(forbiddenDependencies: Set<String>) {
+    configurations.all {
+        resolutionStrategy {
+            eachDependency {
+                val dep = requested.group + ":" + requested.name
+                require(dep !in forbiddenDependencies) {
+                    "$dep in forbiddenDependencies"
+                }
+            }
+        }
+    }
+}

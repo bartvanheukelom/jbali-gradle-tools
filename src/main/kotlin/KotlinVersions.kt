@@ -37,6 +37,7 @@ object KotlinVersions {
     val V1_4_0  = KotlinVersion(1, 4,  0)
     val V1_4_10 = KotlinVersion(1, 4, 10)
     val V1_4_20 = KotlinVersion(1, 4, 20)
+    val V1_4_21 = KotlinVersion(1, 4, 21)
     val V1_4_30 = KotlinVersion(1, 4, 30)
 
 }

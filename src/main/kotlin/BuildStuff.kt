@@ -5,6 +5,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.compile.CompileOptions
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.gradle.jvm.tasks.Jar
 import org.gradle.process.ExecSpec
@@ -67,3 +68,10 @@ fun Project.bash(script: String) {
     }
 }
 
+/**
+ * Stores formal parameter names of constructors and methods in the generated class file so that the method
+ * [java.lang.reflect.Executable.getParameters] from the Reflection API can retrieve them.
+ */
+fun CompileOptions.storeParameterNames() {
+    compilerArgs.add("-parameters")
+}

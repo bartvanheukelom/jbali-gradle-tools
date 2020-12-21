@@ -1,9 +1,8 @@
 package org.jbali.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.jvm.tasks.Jar
-import org.jbali.gradle.kotlinVersion
+import org.gradle.kotlin.dsl.withType
 
 private object ProjectInited {
     const val PROP = "org.jbali.gradle.projectInited"
@@ -18,7 +17,7 @@ private object ProjectInited {
  */
 fun Project.initKotlinProject(
         group: String,
-        name: String,
+        name: String = this.name,
         acceptableKotlinVersions: Set<KotlinVersion>? = null,
         acceptableKotlinVersionStrings: Set<String>? = null
 ) {
@@ -48,8 +47,10 @@ fun Project.initKotlinProject(
             "Name of $this should be '$name'. The project name is taken from the directory name, but can be overriden in `settings.gradle.*`."
         }
 
-        tasks.withType(Jar::class.java).forEach {
-            it.archiveFileName.set("$group.$name.jar")
+        afterEvaluate {
+            tasks.withType<Jar> {
+                archiveFileName.set("$group.$name.jar")
+            }
         }
 
         extensions.extraProperties.set(ProjectInited.PROP, ProjectInited)

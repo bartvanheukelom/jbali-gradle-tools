@@ -1,19 +1,16 @@
 package org.jbali.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.PluginAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
-// copied from kotlin-gradle-plugin
-fun Project.getKotlinPluginVersion(): String? =
+// copied from kotlin-gradle-plugin, modified
+fun Project.getKotlinPluginVersion(): String =
         plugins.asSequence().mapNotNull { (it as? KotlinBasePluginWrapper)?.kotlinPluginVersion }.firstOrNull()
+            ?: throw IllegalStateException("Couldn't detect kotlinPluginVersion from $this's plugins $plugins")
 
 val Project.kotlinVersionString get() =
         (gradle as ExtensionAware).extensions.extraProperties["kotlinVersionString"] as String

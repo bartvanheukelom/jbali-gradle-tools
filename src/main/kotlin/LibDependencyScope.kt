@@ -46,6 +46,14 @@ class LibDependencyScope(
         }
     }
 
+    fun api(dependency: String, defaultVersion: String? = null) {
+        add("api", dependency, defaultVersion)
+    }
+
+    fun implementation(dependency: String, defaultVersion: String? = null) {
+        add("implementation", dependency, defaultVersion)
+    }
+
     /**
      * Add the given dependency to the `compileOnly` and `testImplementation` configurations.
      */

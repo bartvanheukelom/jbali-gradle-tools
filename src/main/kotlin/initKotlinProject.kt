@@ -47,10 +47,8 @@ fun Project.initKotlinProject(
             "Name of $this should be '$name'. The project name is taken from the directory name, but can be overriden in `settings.gradle.*`."
         }
 
-        afterEvaluate {
-            tasks.withType<Jar> {
-                archiveFileName.set("$group.$name.jar")
-            }
+        tasks.withType<Jar>().configureEach {
+            archiveFileName.set("$group.$name.jar")
         }
 
         extensions.extraProperties.set(ProjectInited.PROP, ProjectInited)

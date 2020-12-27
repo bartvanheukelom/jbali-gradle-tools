@@ -1,6 +1,7 @@
 package org.jbali.gradle
 
 import org.gradle.api.Project
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.primaryConstructor
@@ -11,7 +12,11 @@ open class ProjectGroup<T : ProjectWrapper>(
         val children: Map<String, T> =
                 groupProject.childProjects.mapValues { (_, cp) ->
                     try {
-                        type.primaryConstructor!!.call(cp)
+                        try {
+                            type.primaryConstructor!!.call(cp)
+                        } catch (ite: InvocationTargetException) {
+                            throw ite.cause!!
+                        }
                     } catch (e: Throwable) {
                         throw RuntimeException("Exception while wrapping $cp in ${type.simpleName}: $e", e)
                     }
@@ -35,10 +40,10 @@ open class ProjectGroup<T : ProjectWrapper>(
     override fun hashCode() = groupProject.hashCode()
     override fun equals(other: Any?) = other is ProjectGroup<*> && other.groupProject == groupProject
 
-    operator fun getValue(projectGroup: ProjectGroup<T>, property: KProperty<*>): T =
+    operator fun getValue(projectGroup: ProjectGroup<T>, property: KProperty<*>): T? =
         when (property.returnType.classifier) {
-            type -> div(property.name)
-            else -> throw NoSuchElementException()
+            type -> children[property.name]
+            else -> throw NoSuchElementException("Cannot act as delegate for $property")
         }
 
 }

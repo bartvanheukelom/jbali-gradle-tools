@@ -9,25 +9,31 @@ import kotlin.reflect.full.primaryConstructor
 open class ProjectGroup<T : ProjectWrapper>(
         private val groupProject: Project,
         private val type: KClass<out T>,
-        val children: Map<String, T> =
-                groupProject.childProjects.mapValues { (_, cp) ->
-                    try {
-                        try {
-                            type.primaryConstructor!!.call(cp)
-                        } catch (ite: InvocationTargetException) {
-                            throw ite.cause!!
-                        }
-                    } catch (e: Throwable) {
-                        throw RuntimeException("Exception while wrapping $cp in ${type.simpleName}: $e", e)
-                    }
-                }
-) : Set<T> by children.values.toSet() {
+        private val wrapper: ProjectGroup<T>.(Project) -> T = { cp ->
+            try {
+                type.primaryConstructor!!.call(cp)
+            } catch (ite: InvocationTargetException) {
+                throw ite.cause!!
+            }
+        }
+) {
 
-    val name get() = groupProject.name
+    val name: String get() = groupProject.name
+
+    val children: Map<String, T> by lazy {
+        groupProject.logger.info("init ${this}.children")
+        groupProject.childProjects.mapValues { (_, cp) ->
+            try {
+                wrapper(cp)
+            } catch (e: Throwable) {
+                throw RuntimeException("Exception while wrapping $cp in ${type.simpleName}: $e", e)
+            }
+        }
+    }
 
     init {
         @Suppress("LeakingThis")
-        groupProject.logger.info("$this: ${children.keys}")
+        groupProject.logger.info("init $this: ${groupProject.childProjects.keys}")
     }
 
 //    fun configure(action: T.() -> Unit): Iterable<T> =

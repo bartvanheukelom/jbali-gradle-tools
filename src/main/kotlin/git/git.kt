@@ -2,6 +2,8 @@
 package org.jbali.gradle.git
 
 import java.io.File
+import java.net.URI
+import java.security.MessageDigest
 import kotlin.math.min
 
 /**
@@ -13,12 +15,18 @@ class GitRepository(
     val rootDir: File
 ) {
 
-    fun version() =
+    fun version(
+        excludeModifications: List<String> = emptyList()
+    ) =
         GitRepoVersion(
             hashShort = commitHash(short = true),
             hashLong = commitHash(short = false),
             branch = branch(),
-            tags = tags()
+            tags = tags(),
+            remoteUrl = remoteUrl(),
+            modifications = modifications(
+                excludes = excludeModifications
+            )
         )
 
     fun commitHash(short: Boolean = true): GitCommitHash =
@@ -45,40 +53,41 @@ class GitRepository(
             .last()
             .let(::GitBranch)
 
-    // TODO
-//    # Determine if there are any local changes
-//    gdcmd = ['git', 'diff', '--', '.']
-//    with open(".dockerignore", "r") as di:
-//    # what's ignored by docker can also be ignored for this check
-//    for ig in di:
-//    gdcmd.append(":(exclude)" + ig.strip())
-//    local_mods: str = subprocess.check_output(gdcmd).decode("utf8").strip()
-//
-//    # Compose a tag from the commit ID and, if present, a hash of the local modifications.
-//    tag: str = commit_id
-//    if local_mods:
-//    tag += f"_WithMods_{hash_text(local_mods, 4)}"
-//
-//    return VersionTag(tag)
+    fun remoteUrl(): URI =
+        command(listOf("ls-remote", "--get-url"))
+            .trim()
+            .let(::URI)
+
+    fun modifications(
+        excludes: List<String> = emptyList()
+    ): GitModifications? =
+        command(
+            listOf("diff", "--", ".") +
+                    excludes.map { ":(exclude)$it" }
+        )
+            .takeIf { it.isNotBlank() }
+            ?.let(::GitModifications)
 
     /**
      * Run the given git command (without "git" itself) in this repo
      * and returns its full standard output, decoded as UTF-8, untrimmed.
      */
-    fun command(cmd: List<String>) =
+    fun command(gitCmd: List<String>): String {
+        val cmd = listOf("git") + gitCmd
         // TODO function for process with output capture
-        ProcessBuilder()
-            .command(listOf("git") + cmd)
+        return ProcessBuilder()
+            .command(cmd)
             .directory(rootDir)
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .start().run {
                 val output = inputStream.bufferedReader().readText()
                 val exit = waitFor()
                 if (exit != 0) {
-                    throw RuntimeException("Command exited with status $exit")
+                    throw RuntimeException("Command $cmd exited with status $exit")
                 }
                 output
             }
+    }
 
 }
 
@@ -86,9 +95,36 @@ data class GitRepoVersion(
     val hashShort: GitCommitHash,
     val hashLong: GitCommitHash,
     val tags: List<GitTag>,
-    val branch: GitBranch?
-    // TODO localmods
+    val branch: GitBranch?,
+    val remoteUrl: URI,
+    val modifications: GitModifications?
 ) {
+
+    val hashes by lazy {
+        listOf(hashShort, hashLong)
+    }
+
+    val versions: List<String> by lazy {
+        if (modifications != null) {
+            val modSuf = "_WithMods_${modifications.shortHashString}"
+//            hashes.map { "$it$modSuf" }
+            listOf("$hashShort$modSuf")
+        } else {
+            buildList {
+                addAll(tags)
+                addAll(hashes)
+                branch?.let { add(it) }
+            }.map { it.toString() }
+        }
+    }
+
+    /**
+     * - If there are [modifications], then `${hashShort}_WithMods_${modsHash}`.
+     * - Or if this version is clean and tagged in git, the first of the [tags].
+     * - Otherwise, [hashShort].
+     */
+    val canonicalVersion get() = versions.first()
+
     init {
         require(hashLong.isLong)
         require(hashShort prefixEquals hashLong)
@@ -130,3 +166,22 @@ data class GitBranch(
 ) {
     override fun toString() = branch
 }
+
+data class GitModifications(
+    private val dump: String
+) {
+    val hash: ByteArray by lazy {
+        MessageDigest.getInstance("SHA-256")
+            .digest(dump.toByteArray(Charsets.UTF_8))
+    }
+    val shortHashString by lazy {
+        hash.toHexString().substring(0, 4)
+    }
+}
+
+
+private fun ByteArray.toHexString() =
+    @OptIn(ExperimentalUnsignedTypes::class)
+    asUByteArray().joinToString("") {
+        it.toString(16).padStart(2, '0')
+    }

@@ -46,12 +46,16 @@ class GitRepository(
             .map(::GitTag)
 
     // TODO nullable if detached head
-    fun branch(): GitBranch =
-        command(listOf("symbolic-ref", "HEAD"))
-            .trim()
-            .split('/')
-            .last()
-            .let(::GitBranch)
+    fun branch(): GitBranch? =
+        try {
+            command(listOf("symbolic-ref", "--short", "HEAD"))
+                .trim()
+                .let(::GitBranch)
+        } catch (e: RuntimeException) {
+            // probably got an error because of detached HEAD
+            // TODO only catch the real error
+            null
+        }
 
     fun remoteUrl(): URI =
         command(listOf("ls-remote", "--get-url"))

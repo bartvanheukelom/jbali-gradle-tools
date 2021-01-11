@@ -3,7 +3,6 @@ package org.jbali.gradle
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.PluginAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 
@@ -60,18 +59,6 @@ fun KotlinCommonToolOptions.optIn(feature: Experimentals) {
 // doesn't appear like it can be used, will complain "this class can only be used as..."
 inline fun <reified C : Any> KotlinCommonToolOptions.useExperimental() {
     freeCompilerArgs += "-Xuse-experimental=${C::class.qualifiedName}"
-}
-
-enum class KotlinCompilerPlugin {
-    jpa,
-    spring,
-    serialization;
-
-    val id = "org.jetbrains.kotlin.plugin.$name"
-
-    fun applyTo(project: PluginAware) {
-        project.pluginManager.apply(id)
-    }
 }
 
 // ripped from org.gradle.kotlin.dsl (RepositoryHandlerExtensions.kt)

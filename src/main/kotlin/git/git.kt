@@ -43,6 +43,7 @@ class GitRepository(
     fun tags(): List<GitTag> =
         command(listOf("tag", "--points-at", "HEAD"))
             .lines()
+            .filter { it.isNotBlank() }
             .map(::GitTag)
 
     // TODO nullable if detached head
@@ -162,12 +163,18 @@ data class GitCommitHash(
 data class GitTag(
     private val tag: String
 ) {
+    init {
+        require(tag.isNotBlank())
+    }
     override fun toString() = tag
 }
 
 data class GitBranch(
     private val branch: String
 ) {
+    init {
+        require(branch.isNotBlank())
+    }
     override fun toString() = branch
 }
 

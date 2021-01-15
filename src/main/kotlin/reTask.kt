@@ -16,11 +16,20 @@ fun Project.setupReTask() {
             val regex = Regex(project.property("re").toString())
 
             // TODO also detect tasks that are _registered_ after reTask is _configured_
-            allprojects.forEach { p ->
-                p.tasks.forEach { t ->
-                    if (t != reTask && t.path.matches(regex)) {
-                        reTask.dependsOn(t)
-                    }
+            val matches = allprojects
+                .flatMap { it.tasks }
+                .filter { it != reTask && it.path.matches(regex) }
+
+            if (matches.isEmpty()) {
+                throw IllegalArgumentException("No tasks matched $regex")
+            } else {
+                reTask.dependsOn(*matches.toTypedArray())
+            }
+
+            doLast {
+                println("Successfully executed tasks:")
+                matches.forEach {
+                    println("- ${it.path}")
                 }
             }
         }

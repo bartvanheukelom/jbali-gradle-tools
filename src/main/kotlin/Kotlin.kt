@@ -3,7 +3,6 @@ package org.jbali.gradle
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.plugins.ExtensionAware
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 
 // copied from kotlin-gradle-plugin, modified
@@ -28,38 +27,6 @@ val Project.kotlinVersion: KotlinVersion? get() =
         check(kotlinVersionString.startsWith(declaredKotlinVersion.toString()))
         declaredKotlinVersion
     } as KotlinVersion?
-
-fun KotlinCommonToolOptions.enableInlineClasses() {
-//    freeCompilerArgs += "-Xinline-classes"
-    freeCompilerArgs += "-XXLanguage:+InlineClasses"
-}
-
-fun KotlinCommonToolOptions.inlineClasses() {
-    freeCompilerArgs += "-Xinline-classes"
-}
-
-enum class Experimentals(val featureName: String) {
-    Contracts("kotlin.contracts.ExperimentalContracts"),
-    Experimental("kotlin.Experimental"),
-    RequiresOptIn("kotlin.RequiresOptIn")
-}
-
-fun KotlinCommonToolOptions.use(feature: Experimentals) {
-    useExperimental(feature.featureName)
-}
-
-fun KotlinCommonToolOptions.useExperimental(feature: String) {
-    freeCompilerArgs += "-Xuse-experimental=$feature"
-}
-
-fun KotlinCommonToolOptions.optIn(feature: Experimentals) {
-    freeCompilerArgs += "-Xopt-in=${feature.featureName}"
-}
-
-// doesn't appear like it can be used, will complain "this class can only be used as..."
-inline fun <reified C : Any> KotlinCommonToolOptions.useExperimental() {
-    freeCompilerArgs += "-Xuse-experimental=${C::class.qualifiedName}"
-}
 
 // ripped from org.gradle.kotlin.dsl (RepositoryHandlerExtensions.kt)
 private fun RepositoryHandler.maven(url: Any) =

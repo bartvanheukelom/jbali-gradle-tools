@@ -16,6 +16,7 @@ class GitRepository(
 ) {
 
     fun version(
+        ignoreAllLocalMods: Boolean = false,
         excludeModifications: List<String> = emptyList()
     ) =
         GitRepoVersion(
@@ -24,9 +25,12 @@ class GitRepository(
             branch = branch(),
             tags = tags(),
             remoteUrl = remoteUrl(),
-            modifications = modifications(
-                excludes = excludeModifications
-            )
+            modifications =
+                if (ignoreAllLocalMods) null else {
+                    modifications(
+                        excludes = excludeModifications
+                    )
+                }
         )
 
     fun commitHash(short: Boolean = true): GitCommitHash =

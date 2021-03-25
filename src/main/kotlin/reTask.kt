@@ -13,7 +13,12 @@ fun Project.setupReTask() {
         val reTask: TaskProvider<Task> by registering {
 
             val reTask = this
-            val regex = Regex(project.property("re").toString())
+            val regexStr = project.property("re").toString()
+            if (regexStr.isBlank()) {
+                throw IllegalArgumentException("No or empty regex supplied")
+            }
+
+            val regex = Regex(regexStr)
 
             // TODO also detect tasks that are _registered_ after reTask is _configured_
             val matches = allprojects
@@ -21,7 +26,7 @@ fun Project.setupReTask() {
                 .filter { it != reTask && it.path.matches(regex) }
 
             if (matches.isEmpty()) {
-                throw IllegalArgumentException("No tasks matched $regex")
+                throw IllegalArgumentException("No tasks matched regex: $regex")
             } else {
                 reTask.dependsOn(*matches.toTypedArray())
             }

@@ -114,18 +114,30 @@ data class GitRepoVersion(
     }
 
     val versions: List<String> by lazy {
-        if (modifications != null) {
-            val modSuf = "_WithMods_${modifications.shortHashString}"
-//            hashes.map { "$it$modSuf" }
-            listOf("$hashShort$modSuf")
-        } else {
-            buildList {
+        versionNames()
+    }
+
+    fun versionNames(
+        branchesWithMods: Boolean = false
+    ): List<String> =
+        buildList {
+
+            // hashes and tags, more or less immutable
+            if (modifications != null) {
+                val modSuf = "_WithMods_${modifications.shortHashString}"
+    //            hashes.map { "$it$modSuf" }
+                add("$hashShort$modSuf")
+            } else {
                 addAll(tags)
                 addAll(hashes)
+            }
+
+            // branches, mutable
+            if (modifications == null || branchesWithMods) {
                 branch?.let { add(it) }
-            }.map { it.toString() }
-        }
-    }
+            }
+
+        }.map { it.toString() }
 
     /**
      * - If there are [modifications], then `${hashShort}_WithMods_${modsHash}`.

@@ -6,10 +6,15 @@ class LibDependencyScope(
         val project: Project
 ) {
 
-    fun jcenter() {
+    fun mavenCentral() {
         if (project.isRoot) {
-            project.repositories.jcenter()
+            project.repositories.mavenCentral()
         }
+    }
+
+    @Deprecated("jcenter is offline, this redirects to mavenCentral", ReplaceWith("mavenCentral()"))
+    fun jcenter() {
+        mavenCentral()
     }
 
     // TODO delegate to the original kotlin function, but requires plugin availability

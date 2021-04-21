@@ -1,4 +1,6 @@
 @file:OptIn(ExperimentalStdlibApi::class)
+@file:Suppress("MemberVisibilityCanBePrivate") // TODO why isn't this project seen as library with public API?
+
 package org.jbali.gradle.git
 
 import java.io.File
@@ -10,13 +12,14 @@ import kotlin.math.min
  * Allows reading properties of a Git repository at [rootDir].
  * Other than that path, this object is stateless. Each invocation of
  * one of its methods returns the most current information.
+ *
+ * TODO extract to separate library, since it doesn't depend on Gradle at all
  */
 class GitRepository(
     val rootDir: File
 ) {
 
     fun version(
-        ignoreAllLocalMods: Boolean = false,
         excludeModifications: List<String> = emptyList()
     ) =
         GitRepoVersion(
@@ -26,11 +29,9 @@ class GitRepository(
             tags = tags(),
             remoteUrl = remoteUrl(),
             modifications =
-                if (ignoreAllLocalMods) null else {
-                    modifications(
-                        excludes = excludeModifications
-                    )
-                }
+                modifications(
+                    excludes = excludeModifications
+                )
         )
 
     fun commitHash(short: Boolean = true): GitCommitHash =
@@ -70,10 +71,33 @@ class GitRepository(
     fun modifications(
         excludes: List<String> = emptyList()
     ): GitModifications? =
-        command(
-            listOf("diff", "--", ".") +
-                    excludes.map { ":(exclude)$it" }
-        )
+        buildString {
+
+            // full diff for changes (staged and unstaged) to tracked files in this repo, including submodules
+            append(command(
+                listOf(
+                    "diff",
+                    "--submodule=diff",   // full diff for uncommitted changes inside submodule as well
+                    "HEAD",               // compare working tree with last commit -> this makes staged and unstaged changes included
+                    "--", "."             // make sure upcoming excludes are passed as paths
+                ) +
+                        excludes.map { ":(exclude)$it" }
+            ))
+
+            // list of non-ignored untracked files in this repo only, not in submodules
+            // TODO diff
+            // TODO include submodules
+            append(command(
+                listOf(
+                    "ls-files",
+                    "--others",           // untracked files
+                    "--exclude-standard", // apply .gitignore
+                    "--", "."             // make sure upcoming excludes are passed as paths
+                ) +
+                        excludes.map { ":(exclude)$it" }
+            ))
+
+        }
             .takeIf { it.isNotBlank() }
             ?.let(::GitModifications)
 
@@ -150,6 +174,10 @@ data class GitRepoVersion(
         require(hashLong.isLong)
         require(hashShort prefixEquals hashLong)
     }
+
+    fun withoutModifications(): GitRepoVersion =
+        copy(modifications = null)
+
 }
 
 data class GitCommitHash(

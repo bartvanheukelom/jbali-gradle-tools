@@ -1,5 +1,7 @@
 package org.jbali.gradle
 
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+
 
 // TODO more specific name and make this name an extension of DependencyHandlerScope
 object Kotlin {
@@ -39,4 +41,12 @@ object KotlinX {
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
     }
 
+}
+
+/**
+ * Add the private repository for the kotlinx.html dependencies.
+ * Source: [https://github.com/kotlin/kotlinx.html/wiki/Getting-started]
+ */
+fun RepositoryHandler.kotlinxHtmlJbSpace() {
+    maven { setUrl("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }
 }

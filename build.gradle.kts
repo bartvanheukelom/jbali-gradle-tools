@@ -11,13 +11,20 @@ kotlinDslPluginOptions {
 val gradleVersion =
         VersionSupport(
                 name = "Gradle",
-                supported = setOf("6.7.1")
+                supported = setOf(
+                    "6.7.1",
+                    "7.0"
+                )
         ).check(GradleVersion.current().version)
 
 val kotlinVersion =
         VersionSupport(
                 name = "Kotlin",
-                supported = setOf(KotlinVersion(1, 3, 72))
+                supported = setOf(
+                    // comment notes Gradle version which bundles that Kotlin version
+                    KotlinVersion(1, 3, 72), // 6.7.1
+                    KotlinVersion(1, 4, 31)  // 7.0
+                )
         ).check(KotlinVersion.CURRENT)
 
 group = "org.jbali"

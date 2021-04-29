@@ -12,11 +12,11 @@ private fun Settings.testPlugins() {
     pluginManagement.apply {
 
 
-        val kotlinVersion = KotlinVersion(1, 4, 21)
+        val kotlinVersion = KotlinVersion(1, 5, 0)
         val kotlinEAPSuffix = null
 
         plugins.apply {
-            id("org.jetbrains.dokka").version("1.4.20")
+            id("org.jetbrains.dokka").version("1.4.32")
         }
 
         // ============ shared TODO find way to share this =========== //

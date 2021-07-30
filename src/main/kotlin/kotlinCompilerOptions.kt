@@ -2,28 +2,70 @@ package org.jbali.gradle
 
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 
+fun KotlinCommonToolOptions.compilerArg(arg: String) {
+    @Suppress("SuspiciousCollectionReassignment")
+    freeCompilerArgs += arg
+}
 
 fun KotlinCommonToolOptions.enableInlineClasses() {
-//    freeCompilerArgs += "-Xinline-classes"
-    freeCompilerArgs += "-XXLanguage:+InlineClasses"
+    compilerArg("-XXLanguage:+InlineClasses")
 }
 
-fun KotlinCommonToolOptions.inlineClasses() {
-    freeCompilerArgs += "-Xinline-classes"
+
+fun KotlinCommonToolOptions.compilerXArg(name: String, value: Any? = null) {
+    compilerArg(buildString {
+        append("-X")
+        append(name)
+        if (value != null) {
+            append('=')
+            append(value.toString())
+        }
+    })
 }
+
+
+fun KotlinCommonToolOptions.inlineClasses() {
+    compilerXArg("inline-classes")
+}
+
+
+// ----------- jvm-default ------------- //
 
 /**
  * Allows using [JvmDefault].
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("use jvmDefaultAll or jvmDefaultAllCompatibility")
 fun KotlinCommonToolOptions.jvmDefaultEnable() {
-    freeCompilerArgs += "-Xjvm-default=enable"
+    compilerXArg("jvm-default", "enable")
 }
+
 /**
  * Allows using [JvmDefault] in compatibility mode.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("use jvmDefaultAll or jvmDefaultAllCompatibility")
 fun KotlinCommonToolOptions.jvmDefaultCompatibility() {
-    freeCompilerArgs += "-Xjvm-default=compatibility"
+    compilerXArg("jvm-default", "compatibility")
 }
+
+/**
+ * Make all non-abstract members of Kotlin interfaces `default` for the Java classes implementing them.
+ * [https://kotlinlang.org/docs/java-to-kotlin-interop.html#default-methods-in-interfaces]
+ */
+fun KotlinCommonToolOptions.jvmDefaultAll() {
+    compilerXArg("jvm-default", "all")
+}
+
+/**
+ * [https://kotlinlang.org/docs/java-to-kotlin-interop.html#compatibility-mode-for-default-methods]
+ */
+fun KotlinCommonToolOptions.jvmDefaultAllCompatibility() {
+    compilerXArg("jvm-default", "all-compatibility")
+}
+
+
+// ------------ Experimental -------- //
 
 enum class Experimentals(val featureName: String) {
     Contracts("kotlin.contracts.ExperimentalContracts"),
@@ -36,14 +78,14 @@ fun KotlinCommonToolOptions.use(feature: Experimentals) {
 }
 
 fun KotlinCommonToolOptions.useExperimental(feature: String) {
-    freeCompilerArgs += "-Xuse-experimental=$feature"
+    compilerXArg("use-experimental", feature)
 }
 
 fun KotlinCommonToolOptions.optIn(feature: Experimentals) {
-    freeCompilerArgs += "-Xopt-in=${feature.featureName}"
+    compilerXArg("opt-in", feature.featureName)
 }
 
 // doesn't appear like it can be used, will complain "this class can only be used as..."
 inline fun <reified C : Any> KotlinCommonToolOptions.useExperimental() {
-    freeCompilerArgs += "-Xuse-experimental=${C::class.qualifiedName}"
+    compilerXArg("use-experimental", C::class.qualifiedName!!)
 }

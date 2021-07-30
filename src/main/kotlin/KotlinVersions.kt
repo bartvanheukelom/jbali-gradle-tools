@@ -1,7 +1,8 @@
 package org.jbali.gradle
 
 /**
- * [https://github.com/JetBrains/kotlin/blob/master/ChangeLog.md]
+ * - [https://kotlinlang.org/docs/releases.html#release-details]
+ * - [https://github.com/JetBrains/kotlin/blob/master/ChangeLog.md]
  */
 object KotlinVersions {
 
@@ -46,5 +47,9 @@ object KotlinVersions {
     // ================== 1.5 ================= //
 
     val V1_5_0  = KotlinVersion(1, 5,  0)
+    val V1_5_10 = KotlinVersion(1, 5, 10)
+    /** [https://blog.jetbrains.com/kotlin/2021/06/kotlin-1-5-20-released/] */
+    val V1_5_20 = KotlinVersion(1, 5, 20)
+    val V1_5_21 = KotlinVersion(1, 5, 21)
 
 }

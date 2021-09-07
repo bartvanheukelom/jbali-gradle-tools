@@ -22,6 +22,7 @@ object Ktor {
     }
     object Client {
         const val cio = "io.ktor:ktor-client-cio"
+        const val websockets = "io.ktor:ktor-client-websockets"
         object Logging {
             const val jvm = "io.ktor:ktor-client-logging-jvm"
         }

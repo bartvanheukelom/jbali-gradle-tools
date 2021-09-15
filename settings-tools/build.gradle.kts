@@ -7,7 +7,7 @@ plugins {
 group = "org.jbali"
 check(name == "jbali-gradle-settings-tools")
 
-val toolsVersion = "2"
+val toolsVersion = "3"
 val gradleVersion = GradleVersion.current().version
 val variantVersion = "gradle-$gradleVersion"
 version = "${toolsVersion}_$variantVersion"

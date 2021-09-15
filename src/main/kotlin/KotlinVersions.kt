@@ -51,5 +51,6 @@ object KotlinVersions {
     /** [https://blog.jetbrains.com/kotlin/2021/06/kotlin-1-5-20-released/] */
     val V1_5_20 = KotlinVersion(1, 5, 20)
     val V1_5_21 = KotlinVersion(1, 5, 21)
+    val V1_5_30 = KotlinVersion(1, 5, 30)
 
 }

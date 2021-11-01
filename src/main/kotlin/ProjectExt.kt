@@ -17,3 +17,4 @@ operator fun Project.div(child: String): Project =
 //                it.projectDir.name == child
 //            }
             ?: throw NoSuchElementException("$this has no child project named '$child'. Children: $childProjects")
+

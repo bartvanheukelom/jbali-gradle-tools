@@ -54,6 +54,3 @@ fun Project.kotlinRepositories() {
         mavenCentral()
     }
 }
-
-fun ExtraPropertiesExtension.opt(name: String): Any? =
-    if (has(name)) get(name) else null

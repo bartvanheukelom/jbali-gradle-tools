@@ -23,6 +23,11 @@ fun Project.initKotlinProject(
 ) {
 
     try {
+        
+        this.group = group
+        check(this.name == name) {
+            "Name of $this should be '$name'. The project name is taken from the directory name, but can be overriden in `settings.gradle.*`."
+        }
 
         // get kotlinVersion to check consistency between declared and plugin version
         kotlinVersion
@@ -35,16 +40,21 @@ fun Project.initKotlinProject(
             akvs += it
         }
 
-        if (!akvs.isEmpty()) {
-            check(kotlinVersionString in akvs) {
-                "kotlinVersionString $kotlinVersionString is not in acceptableKotlinVersions $akvs"
+        if (akvs.isNotEmpty()) {
+            val fp = "$group.$name.forceKotlinVersion"
+            val force = projectOrBuildProp(fp).isTrueProp
+            if (kotlinVersionString !in akvs) {
+                val err = "kotlinVersionString $kotlinVersionString is not in acceptableKotlinVersions $akvs"
+                if (force) {
+                    logger.warn("$err, but forceKotlinVersion is in effect")
+                } else {
+                    error("$err. add it, or set project/build property ${fp}=true")
+                }
+            } else {
+                if (force) {
+                    logger.warn("forceKotlinVersion has been applied but is redundant, since kotlinVersionString $kotlinVersionString is in acceptableKotlinVersions $akvs")
+                }
             }
-        }
-
-        this.group = group
-
-        check(this.name == name) {
-            "Name of $this should be '$name'. The project name is taken from the directory name, but can be overriden in `settings.gradle.*`."
         }
 
         tasks.withType<Jar>().configureEach {

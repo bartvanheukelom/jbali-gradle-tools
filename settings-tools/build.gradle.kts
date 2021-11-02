@@ -7,7 +7,9 @@ plugins {
 group = "org.jbali"
 check(name == "jbali-gradle-settings-tools")
 
+// if you change this, remove all the old jars from lib!
 val toolsVersion = "3"
+
 val gradleVersion = GradleVersion.current().version
 val variantVersion = "gradle-$gradleVersion"
 version = "${toolsVersion}_$variantVersion"

@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
@@ -13,6 +14,7 @@ interface KotlinProject : Project {
     val nativeConfigurations: ConfigurationContainer
 
     override fun getConfigurations() = KotlinConfigurationContainer(nativeConfigurations)
+    val sourceSets get() = extensions.getByName("sourceSets") as SourceSetContainer
 
     val jarTask: TaskProvider<Jar> get() = tasks.named<Jar>("jar")
 

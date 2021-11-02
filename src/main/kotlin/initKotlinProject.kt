@@ -58,7 +58,7 @@ fun Project.initKotlinProject(
         }
 
         tasks.withType<Jar>().configureEach {
-            archiveFileName.set("$group.$name.jar")
+            archiveBaseName.set("$group.$name")
         }
 
         extensions.extraProperties.set(ProjectInited.PROP, ProjectInited)

@@ -1,6 +1,8 @@
 package org.jbali.gradle
 
+import org.gradle.api.JavaVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 fun KotlinCommonToolOptions.compilerArg(arg: String) {
     @Suppress("SuspiciousCollectionReassignment")
@@ -30,6 +32,7 @@ fun KotlinCommonToolOptions.inlineClasses() {
 
 
 // ----------- jvm-default ------------- //
+// TODO shouldn't the receivers be KotlinToolOptions?
 
 /**
  * Allows using [JvmDefault].
@@ -64,6 +67,12 @@ fun KotlinCommonToolOptions.jvmDefaultAllCompatibility() {
     compilerXArg("jvm-default", "all-compatibility")
 }
 
+
+// ------------ JVM ------------- //
+
+fun KotlinJvmOptions.setJvmTarget(javaVersion: JavaVersion) {
+    jvmTarget = javaVersion.toString()
+}
 
 // ------------ Experimental -------- //
 

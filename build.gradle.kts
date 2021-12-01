@@ -14,7 +14,8 @@ val gradleVersion =
                 supported = setOf(
                     "6.7.1",
                     "7.0",
-                    "7.2"
+                    "7.2",
+                    "7.3"
                 )
         ).check(GradleVersion.current().version)
 
@@ -25,7 +26,8 @@ val kotlinVersion =
                     // comment notes Gradle version which bundles that Kotlin version
                     KotlinVersion(1, 3, 72), // 6.7.1
                     KotlinVersion(1, 4, 31), // 7.0
-                    KotlinVersion(1, 5, 21)  // 7.2
+                    KotlinVersion(1, 5, 21), // 7.2
+                    KotlinVersion(1, 5, 31)  // 7.3
                 )
         ).check(KotlinVersion.CURRENT)
 

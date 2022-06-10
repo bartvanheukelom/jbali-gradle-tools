@@ -58,5 +58,12 @@ object KotlinVersions {
     // ================== 1.6 ================= //
     
     val V1_6_0  = KotlinVersion(1, 6,  0)
+    val V1_6_10 = KotlinVersion(1, 6, 10)
+    val V1_6_20 = KotlinVersion(1, 6, 20)
+    
+    
+    // ================== 1.7 ================= //
+    
+    val V1_7_0  = KotlinVersion(1, 7,  0)
 
 }

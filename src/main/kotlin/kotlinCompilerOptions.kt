@@ -9,11 +9,14 @@ fun KotlinCommonToolOptions.compilerArg(arg: String) {
     freeCompilerArgs += arg
 }
 
+@Deprecated("enabled by default in newer versions... but since when?")
 fun KotlinCommonToolOptions.enableInlineClasses() {
     compilerArg("-XXLanguage:+InlineClasses")
 }
 
-
+/**
+ * Adds compiler argument `-X${name}[=${value}]`
+ */
 fun KotlinCommonToolOptions.compilerXArg(name: String, value: Any? = null) {
     compilerArg(buildString {
         append("-X")
@@ -26,8 +29,22 @@ fun KotlinCommonToolOptions.compilerXArg(name: String, value: Any? = null) {
 }
 
 
+@Deprecated("enabled by default in newer versions... but since when?")
 fun KotlinCommonToolOptions.inlineClasses() {
     compilerXArg("inline-classes")
+}
+
+/**
+ * Enable parallel compilation of a single module, available since 1.6.20.
+ *
+ * [https://kotlinlang.org/docs/whatsnew1620.html#support-for-parallel-compilation-of-a-single-module-in-the-jvm-backend]
+ *
+ * @param n The number of threads you want to use. It should not be greater than your number of CPU cores;
+ *           otherwise, parallelization stops being effective because of switching context between threads.
+ *           0 to use a separate thread for each CPU core.
+ */
+fun KotlinCommonToolOptions.setBackendThreads(n: Int = 0) {
+    compilerXArg("backend-threads", n)
 }
 
 
@@ -79,6 +96,7 @@ fun KotlinJvmOptions.setJvmTarget(javaVersion: JavaVersion) {
 enum class Experimentals(val featureName: String) {
     Contracts("kotlin.contracts.ExperimentalContracts"),
     Experimental("kotlin.Experimental"),
+    @Deprecated("since 1.7.0")
     RequiresOptIn("kotlin.RequiresOptIn")
 }
 

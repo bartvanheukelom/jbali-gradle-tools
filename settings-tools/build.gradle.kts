@@ -25,6 +25,14 @@ kotlin {
 }
 
 tasks {
+    
+    val wrapper by existing(Wrapper::class) {
+        // after updating this, run `./gradlew wrapper && ./gradlew build`, then commit the jar
+        gradleVersion = "7.4.2"
+        // get sources
+        distributionType = Wrapper.DistributionType.ALL
+    }
+    
     jar {
         destinationDirectory.set(file("lib"))
         archiveFileName.set("$variantVersion.jar")

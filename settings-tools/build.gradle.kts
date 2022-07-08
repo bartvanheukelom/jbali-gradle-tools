@@ -13,7 +13,7 @@ val variantVersion = "gradle-$gradleVersion"
 version = "${toolsVersion}_$variantVersion"
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 kotlin {

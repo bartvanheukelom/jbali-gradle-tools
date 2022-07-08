@@ -36,7 +36,7 @@ private fun RepositoryHandler.maven(url: Any) =
 
 fun Project.kotlinRepositories() {
     with (repositories) {
-        jcenter()
+        mavenCentral()
 
         if (kotlinEAP) {
             maven("https://dl.bintray.com/kotlin/kotlin-eap")

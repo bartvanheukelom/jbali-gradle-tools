@@ -41,7 +41,7 @@ private fun Settings.testPlugins() {
         }
 
         repositories.apply {
-            jcenter()
+            mavenCentral()
             gradlePluginPortal()
 
             if (kotlinEAP) {

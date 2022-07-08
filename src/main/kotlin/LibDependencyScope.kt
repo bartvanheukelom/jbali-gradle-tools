@@ -6,9 +6,9 @@ class LibDependencyScope(
         val project: Project
 ) {
 
-    fun jcenter() {
+    fun mavenCentral() {
         if (project.isRoot) {
-            project.repositories.jcenter()
+            project.repositories.mavenCentral()
         }
     }
 

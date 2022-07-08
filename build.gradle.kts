@@ -24,7 +24,7 @@ group = "org.jbali"
 check(name == "jbali-gradle-tools")
 
 repositories {
-    jcenter()
+    mavenCentral()
     gradlePluginPortal()
 }
 

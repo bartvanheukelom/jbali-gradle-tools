@@ -67,6 +67,17 @@ class GitRepository(
         command(listOf("ls-remote", "--get-url"))
             .trim()
             .let(::URI)
+    
+    fun latestTagInBranch(): String? =
+        try {
+            command(listOf("describe", "--tags", "--abbrev=0")).trim()
+        } catch (e: ProcessExitException) {
+            if (e.exitCode == 128) {
+                null
+            } else {
+                throw e
+            }
+        }
 
     fun modifications(
         excludes: List<String> = emptyList()
@@ -116,13 +127,15 @@ class GitRepository(
                 val output = inputStream.bufferedReader().readText()
                 val exit = waitFor()
                 if (exit != 0) {
-                    throw RuntimeException("Command $cmd exited with status $exit")
+                    throw ProcessExitException("Command $cmd exited with status $exit", exit)
                 }
                 output
             }
     }
 
 }
+
+class ProcessExitException(message: String, val exitCode: Int) : RuntimeException(message)
 
 data class GitRepoVersion(
     val hashShort: GitCommitHash,

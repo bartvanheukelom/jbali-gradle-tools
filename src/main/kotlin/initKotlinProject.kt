@@ -48,7 +48,7 @@ fun Project.initKotlinProject(
                 if (force) {
                     logger.warn("$err, but forceKotlinVersion is in effect")
                 } else {
-                    error("$err. add it, or set project/build property ${fp}=true")
+                    error("$err.\nAdd it, or set project/build property ${fp}=true.")
                 }
             } else {
                 if (force) {

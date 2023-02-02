@@ -71,11 +71,6 @@ tasks {
 
 if (toolsVersion != null) {
     publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-            }
-        }
         repositories {
             maven {
                 name = "GitHubPackages"

@@ -1,5 +1,13 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
+import java.io.File
+import java.net.URI
+import java.security.MessageDigest
+import kotlin.math.min
+
 plugins {
     `kotlin-dsl`
+    `maven-publish`
 }
 
 kotlinDslPluginOptions {
@@ -14,7 +22,8 @@ val gradleVersion =
 //                    "7.0",
 //                    "7.2",
 //                    "7.3",
-                    "7.4.2",
+//                    "7.4.2",
+                    "7.6",
                 )
         ).check(GradleVersion.current().version)
 
@@ -26,12 +35,17 @@ val kotlinVersion =
 //                    KotlinVersion(1, 3, 72), // 6.7.1
 //                    KotlinVersion(1, 4, 31), // 7.0
 //                    KotlinVersion(1, 5, 21), // 7.2
-                    KotlinVersion(1, 5, 31)  // 7.3 .. 7.4.2
+//                    KotlinVersion(1, 5, 31), // 7.3 .. 7.4.2
+                    KotlinVersion(1, 7, 10),   // 7.6
                 )
         ).check(KotlinVersion.CURRENT)
 
 group = "org.jbali"
 check(name == "jbali-gradle-tools")
+val toolsVersion = properties["toolsVersion"] // TODO get from git
+toolsVersion?.let {
+    version = "${it}_gradle-${gradleVersion}"
+}
 
 repositories {
     mavenCentral()
@@ -49,11 +63,42 @@ kotlin {
 
 tasks {
     val wrapper by existing(Wrapper::class) {
-        gradleVersion = "7.4.2"
+        gradleVersion = "7.6"
         // get sources
         distributionType = Wrapper.DistributionType.ALL
     }
 }
+
+if (toolsVersion != null) {
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
+        }
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                // TODO determine this from the configured git remote
+                url = uri("https://maven.pkg.github.com/bartvanheukelom/jbali-gradle-tools")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR") ?: "bartvanheukelom"
+                    password = System.getenv("GITHUB_TOKEN")
+                        ?: file(".github-token").takeIf { it.exists() }?.readText()?.trim()
+                        ?: System.console()?.readPassword("GitHub Personal Access Token: ")?.joinToString("")
+                        ?: throw IllegalStateException("No GITHUB_TOKEN env var and no console available to prompt for token")
+                }
+            }
+        }
+    }
+} else {
+    tasks.named("publish") {
+        doFirst {
+            throw IllegalStateException("Cannot publish without toolsVersion property set")
+        }
+    }
+}
+
 
 // --------------- helpers -------------- //
 

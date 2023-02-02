@@ -3,13 +3,14 @@ package org.jbali.gradle
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.ExtraPropertiesExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+
+
 
 // copied from kotlin-gradle-plugin, modified
-fun Project.getKotlinPluginVersion(): String =
-        plugins.asSequence().mapNotNull { (it as? KotlinBasePluginWrapper)?.kotlinPluginVersion }.firstOrNull()
-            ?: throw IllegalStateException("Couldn't detect kotlinPluginVersion from $this's plugins $plugins")
+//fun Project.getKotlinPluginVersion(): String =
+//        plugins.asSequence().mapNotNull { (it as? KotlinBasePluginWrapper)?.kotlinPluginVersion }.firstOrNull()
+//            ?: throw IllegalStateException("Couldn't detect kotlinPluginVersion from $this's plugins $plugins")
 
 val Project.kotlinVersionString get() =
     (gradle as ExtensionAware).extensions.extraProperties.opt("pluginVersions.org.jetbrains.kotlin") as? String

@@ -50,3 +50,21 @@ object KotlinX {
 fun RepositoryHandler.kotlinxHtmlJbSpace() {
     maven { setUrl("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }
 }
+
+/**
+ * For a given Kotlin version, contains the latest compatible versions of essential libraries:
+ * Serialization, Coroutines, Dokka.
+ */
+data class KotlinLinkedLibVersions(
+    // https://github.com/Kotlin/kotlinx.serialization/releases
+    val serialization: String,
+    // https://github.com/Kotlin/kotlinx.coroutines/releases
+    val coroutines: String,
+    // https://github.com/Kotlin/dokka/releases
+    // https://mvnrepository.com/artifact/org.jetbrains.dokka/dokka-gradle-plugin
+    val dokka: String,
+)
+
+val kotlinLinkedLibVersions: Map<KotlinVersion, KotlinLinkedLibVersions> = mapOf(
+    KotlinVersions.V1_8_10 to KotlinLinkedLibVersions("1.5.0", "1.7.0-Beta", "1.8.10"),
+)

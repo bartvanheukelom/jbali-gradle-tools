@@ -7,32 +7,27 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 
 
-// copied from kotlin-gradle-plugin, modified
-//fun Project.getKotlinPluginVersion(): String =
-//        plugins.asSequence().mapNotNull { (it as? KotlinBasePluginWrapper)?.kotlinPluginVersion }.firstOrNull()
-//            ?: throw IllegalStateException("Couldn't detect kotlinPluginVersion from $this's plugins $plugins")
-
+/**
+ * The version of the Kotlin plugin, compiler and stdlib used for this project.
+ *
+ * NOT the version of Kotlin used by Gradle and the build scripts.
+ */
 val Project.kotlinVersionString get() =
     (gradle as ExtensionAware).extensions.extraProperties.opt("pluginVersions.org.jetbrains.kotlin") as? String
         ?: getKotlinPluginVersion()
 
-//val Project.kotlinEAP get() =
-//        (gradle as ExtensionAware).extensions.extraProperties["kotlinEAP"] as Boolean
-
-//val Project.declaredKotlinVersion: KotlinVersion? get() =
-//        (gradle as ExtensionAware).extensions.extraProperties["kotlinVersion"] as KotlinVersion?
-
+/**
+ * The parsed version of the Kotlin plugin, compiler and stdlib used for this project.
+ * Any suffix, like for EAP versions, is removed. Use [kotlinVersionString] for the full, raw version string.
+ *
+ * NOT the version of Kotlin used by Gradle and the build scripts.
+ */
 val Project.kotlinVersion: KotlinVersion? get() =
     (this as ExtensionAware).extensions.extraProperties.properties.getOrPut("kotlinVersion") {
-//        check(getKotlinPluginVersion() == "$kotlinVersionString") {
-//            "kotlinPluginVersion ${getKotlinPluginVersion()} != kotlinVersionString $kotlinVersionString"
-//        }
-//        check(kotlinVersionString.startsWith(declaredKotlinVersion.toString()))
-//        declaredKotlinVersion
-        
-        kotlinVersionString
-            .substringBeforeLast('-')
-            .split('.')
+
+        kotlinVersionString // 1.4.0[-eap-123]
+            .substringBeforeLast('-') // 1.4.0
+            .split('.') // ["1", "4", "0"]
             .let { KotlinVersion(
                 it[0].toInt(),
                 it[1].toInt(),
@@ -55,3 +50,24 @@ fun Project.kotlinRepositories() {
         mavenCentral()
     }
 }
+
+
+
+// old code snippets that may be useful in the future:
+
+//        check(getKotlinPluginVersion() == "$kotlinVersionString") {
+//            "kotlinPluginVersion ${getKotlinPluginVersion()} != kotlinVersionString $kotlinVersionString"
+//        }
+//        check(kotlinVersionString.startsWith(declaredKotlinVersion.toString()))
+//        declaredKotlinVersion
+
+//val Project.kotlinEAP get() =
+//        (gradle as ExtensionAware).extensions.extraProperties["kotlinEAP"] as Boolean
+
+//val Project.declaredKotlinVersion: KotlinVersion? get() =
+//        (gradle as ExtensionAware).extensions.extraProperties["kotlinVersion"] as KotlinVersion?
+
+// copied from kotlin-gradle-plugin, modified
+//fun Project.getKotlinPluginVersion(): String =
+//        plugins.asSequence().mapNotNull { (it as? KotlinBasePluginWrapper)?.kotlinPluginVersion }.firstOrNull()
+//            ?: throw IllegalStateException("Couldn't detect kotlinPluginVersion from $this's plugins $plugins")

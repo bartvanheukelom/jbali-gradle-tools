@@ -68,5 +68,13 @@ object KotlinVersions {
     val V1_7_10 = KotlinVersion(1, 7, 10)
     val V1_7_20 = KotlinVersion(1, 7, 20)
     val V1_7_21 = KotlinVersion(1, 7, 21)
+    
+    
+    // ================== 1.8 ================= //
+    
+    /** 2022-12-28 */
+    val V1_8_0  = KotlinVersion(1, 8,  0)
+    /** 2023-02-02 */
+    val V1_8_10 = KotlinVersion(1, 8, 10)
 
 }

@@ -11,6 +11,5 @@ fun AbstractArchiveTask.logArchiveNameParts() {
     logger.info("archiveExtension=${archiveExtension.orNull}")
     logger.info("archiveFileName=${archiveFileName.orNull}")
     logger.info("archiveVersion=${archiveVersion.orNull}")
-    logger.info("archiveName=${archiveName}")
-    logger.info("archivePath=${archivePath}")
+    logger.info("archiveFile=${archiveFile}")
 }

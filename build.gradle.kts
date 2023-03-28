@@ -10,35 +10,26 @@ plugins {
     `maven-publish`
 }
 
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
+val isWrapperBuild = gradle.startParameter.taskRequests.any {
+    it.projectPath == null && it.rootDir == null && it.args.any(Regex(":?wrapper")::matches)
 }
-
+val recommendedGradleVersion = "8.0.2"
 val gradleVersion =
         VersionSupport(
-                name = "Gradle",
-                supported = setOf(
-//                    "6.7.1",
-//                    "7.0",
-//                    "7.2",
-//                    "7.3",
-//                    "7.4.2",
-                    "7.6",
-                )
-        ).check(GradleVersion.current().version)
+            name = "Gradle",
+            supported = setOf(
+                recommendedGradleVersion,
+            )
+        ).check(GradleVersion.current().version, isWrapperBuild)
 
 val kotlinVersion =
         VersionSupport(
                 name = "Kotlin",
                 supported = setOf(
                     // comment notes Gradle versions which bundle that Kotlin version
-//                    KotlinVersion(1, 3, 72), // 6.7.1
-//                    KotlinVersion(1, 4, 31), // 7.0
-//                    KotlinVersion(1, 5, 21), // 7.2
-//                    KotlinVersion(1, 5, 31), // 7.3 .. 7.4.2
-                    KotlinVersion(1, 7, 10),   // 7.6
+                    KotlinVersion(1, 8, 10),   // 8.0
                 )
-        ).check(KotlinVersion.CURRENT)
+        ).check(KotlinVersion.CURRENT, isWrapperBuild)
 
 group = "org.jbali"
 check(name == "jbali-gradle-tools")
@@ -63,9 +54,9 @@ kotlin {
 
 tasks {
     val wrapper by existing(Wrapper::class) {
-        gradleVersion = "7.6"
-        // get sources
-        distributionType = Wrapper.DistributionType.ALL
+        gradleVersion = recommendedGradleVersion
+        distributionType = Wrapper.DistributionType.ALL // get sources
+        distributionSha256Sum = "47a5bfed9ef814f90f8debcbbb315e8e7c654109acd224595ea39fca95c5d4da"
     }
 }
 
@@ -102,12 +93,14 @@ data class VersionSupport<V : Any>(
         val supported: Set<V>,
         val unsupported: Set<V> = emptySet()
 ) {
-    fun check(current: V): V {
-        if (current in unsupported) {
-            throw IllegalStateException("This build does not support $name version $current")
-        }
-        if (current !in supported) {
-            throw IllegalStateException("This build is untested with $name version $current")
+    fun check(current: V, skip: Boolean = false): V {
+        if (!skip) {
+            if (current in unsupported) {
+                throw IllegalStateException("This build does not support $name version $current")
+            }
+            if (current !in supported) {
+                throw IllegalStateException("This build is untested with $name version $current")
+            }
         }
         return current
     }

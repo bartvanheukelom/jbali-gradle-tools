@@ -8,8 +8,9 @@ plugins {
 group = "org.jbali"
 check(name == "jbali-gradle-settings-tools")
 
-// if you change this, remove all the old jars from lib!
+// see README for what to do when changing these
 val toolsVersion = "1.3"
+val recommendedGradleVersion = "8.0.2"
 
 val gradleVersion = GradleVersion.current().version
 val variantVersion = "gradle-$gradleVersion"
@@ -29,10 +30,8 @@ kotlin {
 tasks {
     
     val wrapper by existing(Wrapper::class) {
-        // after updating this, run `./gradlew wrapper && ./gradlew build`, then commit the jar
-        gradleVersion = "7.6"
-        // get sources
-        distributionType = Wrapper.DistributionType.ALL
+        gradleVersion = recommendedGradleVersion
+        distributionType = Wrapper.DistributionType.ALL  // get sources
     }
     
     jar {

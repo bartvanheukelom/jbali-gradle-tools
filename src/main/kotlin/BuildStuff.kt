@@ -2,19 +2,11 @@ package org.jbali.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.compile.CompileOptions
 import org.gradle.internal.deprecation.DeprecatableConfiguration
-import org.gradle.jvm.tasks.Jar
-import org.gradle.process.ExecSpec
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import java.io.File
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
-import kotlin.reflect.full.primaryConstructor
 
 /**
  * Setting a breakpoint in a build.gradle.kts file doesn't always work correctly in IntelliJ,
@@ -104,3 +96,8 @@ fun Project.forbidDependencies(forbiddenDependencies: Set<String>) {
         }
     }
 }
+
+val Gradle.isWrapperBuild: Boolean get() =
+    startParameter.taskRequests.any {
+        it.projectPath == null && it.rootDir == null && it.args.any(Regex(":?wrapper")::matches)
+    }

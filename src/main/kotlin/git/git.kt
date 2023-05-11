@@ -3,6 +3,8 @@
 
 package org.jbali.gradle.git
 
+import org.jbali.gradle.div
+import org.jetbrains.kotlin.gradle.targets.js.jsQuoted
 import java.io.File
 import java.net.URI
 import java.security.MessageDigest
@@ -248,8 +250,109 @@ data class GitModifications(
 }
 
 
+
+
+// <mode> <object> <stage>\t<file>
+// filename may include newlines
+private val gitLsZPattern = Regex("""(\d{6}) ([0-9a-f]{40}) (\d+)\t(.+)""")
+
+data class GitLsFile(
+    val mode: Int,
+    val obj: String,
+    val stage: Int,
+    val file: String,
+) {
+    override fun toString(): String =
+        "$mode $obj $stage ${file.jsQuoted()}"
+}
+
+fun GitRepository.inited() = (rootDir / ".git").exists()
+
+fun GitRepository.withSubmodules(): Sequence<GitRepository> {
+    val base = this
+    return sequence {
+        yield(base)
+        if (inited()) {
+            yieldAll(submodules().flatMap { base.submodule(it.file).withSubmodules() })
+        }
+    }
+}
+
+fun GitRepository.submodule(path: String): GitRepository =
+    GitRepository(File(this.rootDir, path))
+
+/**
+ * Returns relative paths of all submodule references in this repository.
+ * This includes those that have not been inited. That is, it returns the paths
+ * of all 160000 entries in the index. Does not recurse.
+ */
+fun GitRepository.submodules(): Sequence<GitLsFile> =
+    // https://git-scm.com/docs/git-ls-files
+    command(listOf(
+        "ls-files", "--stage",
+        "-z", // NUL line termination on output and do not quote filenames
+    ))
+        .splitToSequence('\u0000')
+        
+        .filter { it.startsWith("160000") } // only gitlinks; first line of filtering, fast but less robust
+//        .filter { it.isNotBlank() } // last line is empty - disabled because previous filter makes this redundant, but required when refactored into general ls-files parser
+        
+        // parse
+        .map { gitLsZPattern.matchEntire(it) ?: error("Unexpected output from git ls-files: $it") }
+        .map { m -> m.groupValues }
+        .map { g -> GitLsFile(
+            mode = g[1].toInt(),
+            obj = g[2],
+            stage = g[3].toInt(),
+            file = g[4],
+        ) }
+        
+        // only gitlinks
+        .filter { it.mode == 160000 }
+
+
+fun GitRepository.submoduleRepos(): Sequence<GitRepository> =
+    submodules()
+        .map { submodule(it.file) }
+        .filter { it.inited() }
+
+
+
+
+
+// not git:
+
+
 private fun ByteArray.toHexString() =
     @OptIn(ExperimentalUnsignedTypes::class)
     asUByteArray().joinToString("") {
         it.toString(16).padStart(2, '0')
     }
+
+/**
+ * ```
+ * data class Node(val name, val children: List<Node> = emptyList())
+ * val tree = Node("root", listOf(
+ *    Node("a", listOf(Node("alex"))),
+ *    Node("b", listOf(Node("bob"))),
+ * ))
+ * tree.recursiveFlatten { it.children }.toList() == listOf(
+ *   listOf(root),
+ *   listOf(root, a),
+ *   listOf(root, a, alex),
+ *   listOf(root, b),
+ *   listOf(root, b, bob),
+ *   )
+ */
+fun <T> T.recursiveFlatten(children: (T) -> Sequence<T>): Sequence<List<T>> =
+    sequence {
+        recursiveFlatten(listOf(), this@recursiveFlatten, children)
+    }
+
+suspend fun <T> SequenceScope<List<T>>.recursiveFlatten(prefix: List<T>, element: T, children: (T) -> Sequence<T>) {
+    val elPath = prefix + element
+    yield(elPath)
+    children(element).forEach { child ->
+        recursiveFlatten(elPath, child, children)
+    }
+}

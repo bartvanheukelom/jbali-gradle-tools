@@ -77,4 +77,9 @@ object KotlinVersions {
     /** 2023-02-02 */
     val V1_8_10 = KotlinVersion(1, 8, 10)
 
+    
+    // ================== 1.9 ================= //
+    
+    val V1_9_0  = KotlinVersion(1, 9,  0)
+    
 }

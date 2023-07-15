@@ -66,5 +66,7 @@ data class KotlinLinkedLibVersions(
 )
 
 val kotlinLinkedLibVersions: Map<KotlinVersion, KotlinLinkedLibVersions> = mapOf(
+    //                                                serialz  coro          dokka
     KotlinVersions.V1_8_10 to KotlinLinkedLibVersions("1.5.0", "1.7.0-Beta", "1.8.10"),
+    KotlinVersions.V1_9_0  to KotlinLinkedLibVersions("1.5.1", "1.7.2",      "1.8.20"),
 )

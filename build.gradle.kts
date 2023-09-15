@@ -1,10 +1,5 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
-import java.io.File
-import java.net.URI
-import java.security.MessageDigest
-import kotlin.math.min
-
 plugins {
     `kotlin-dsl`
     `maven-publish`
@@ -13,7 +8,7 @@ plugins {
 val isWrapperBuild = gradle.startParameter.taskRequests.any {
     it.projectPath == null && it.rootDir == null && it.args.any(Regex(":?wrapper")::matches)
 }
-val recommendedGradleVersion = "8.0.2"
+val recommendedGradleVersion = "8.3"
 val gradleVersion =
         VersionSupport(
             name = "Gradle",
@@ -27,7 +22,8 @@ val kotlinVersion =
                 name = "Kotlin",
                 supported = setOf(
                     // comment notes Gradle versions which bundle that Kotlin version
-                    KotlinVersion(1, 8, 10),   // 8.0
+//                    KotlinVersion(1, 8, 10),   // 8.0
+                    KotlinVersion(1, 9, 0),   // 8.3
                 )
         ).check(KotlinVersion.CURRENT, isWrapperBuild)
 

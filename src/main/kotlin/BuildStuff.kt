@@ -41,7 +41,8 @@ operator fun File.div(child: String) =
 
 val Configuration.deprecatedForDeclaration: Boolean get() =
         when (this) {
-            is DeprecatableConfiguration -> this.declarationAlternatives != null
+            // TODO broken. some deprecated configs have this as empty array, but some non-deprecated ones also do?
+            is DeprecatableConfiguration -> this.declarationAlternatives?.isNotEmpty() == true
             else -> false
         }
 

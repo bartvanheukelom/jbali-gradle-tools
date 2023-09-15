@@ -10,7 +10,7 @@ check(name == "jbali-gradle-settings-tools")
 
 // see README for what to do when changing these
 val toolsVersion = "1.3"
-val recommendedGradleVersion = "8.0.2"
+val recommendedGradleVersion = "8.3"
 
 val gradleVersion = GradleVersion.current().version
 val variantVersion = "gradle-$gradleVersion"

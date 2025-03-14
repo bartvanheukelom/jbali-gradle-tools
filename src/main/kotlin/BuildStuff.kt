@@ -83,16 +83,26 @@ fun Project.forbidDependencies(vararg forbiddenDependencies: String) {
 /**
  * Configure dependency resolution to throw a hard error if anything
  * in the builds tries to pull in one of the given dependencies.
- * Specify the dependencies as "$group:$name" (no version).
+ * Specify the dependencies as "$group:$name" or "$group:$name:$version".
  */
 fun Project.forbidDependencies(forbiddenDependencies: Set<String>) {
+    val project = this
     configurations.all {
+        val config = this
         resolutionStrategy {
             eachDependency {
-                val dep = requested.group + ":" + requested.name
-                require(dep !in forbiddenDependencies) {
-                    "$dep in forbiddenDependencies"
+                fun check(dep: String) {
+                    if (dep in forbiddenDependencies) {
+                        // log separately because the thrown exception is sometimes hidden by an obscure error
+                        val e = RuntimeException("Forbidden dependency in ${project.path} configuration ${config.name}: $dep")
+                        logger.error("Error", e)
+                        throw e
+                    }
                 }
+                val dep = requested.group + ":" + requested.name
+                val vdep = dep + ":" + requested.version
+                check(dep)
+                check(vdep)
             }
         }
     }
